@@ -14,6 +14,7 @@ public class Tests
     {
         // Arrange
         List<string> input = [.. """
+        hello world
         """.Split('\n')];
         Solver sut = new(input);
 
@@ -29,6 +30,7 @@ public class Tests
     {
         // Arrange
         List<string> input = [.. """
+        hello world
         """.Split('\n')];
         Solver sut = new(input);
 

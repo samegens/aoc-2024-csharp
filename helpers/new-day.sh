@@ -27,4 +27,4 @@ dotnet add SolverTests/SolverTests.csproj reference Solver/Solver.csproj
 touch Solver/input.txt
 cp ../helpers/*.cs Solver/
 rm SolverTests/*.cs
-cp ../helpers/SolverTests.cs/*.cs SolverTests
+cp ../helpers/SolverTests/*.cs SolverTests
