@@ -66,6 +66,13 @@ public class Solver(List<string> lines)
 
     public int SolvePart2()
     {
+        // We need the join because the complete content (all lines combined)
+        // is considered to form the corrupted memory. If we don't join, the
+        // logic of FindEnabledMuls will reset 'enabled' to true on the next line,
+        // while the last state may still be 'disabled'.
+        // I could have changed class parameter 'lines' to line or input, but
+        // this is the way the solvers for all days are structured. Adding a join
+        // was much easier than refactoring all code and tests.
         return FindEnabledMuls(string.Join("", lines)).Sum(m => m.Execute());
     }
 }
