@@ -6,6 +6,7 @@ public class Mul(int op1, int op2)
     public int Op2 => op2;
     public int Execute() => op1 * op2;
 
+    // Implement Equals so unit tests can use Is.EquivalentTo.
     public override bool Equals(object? other)
     {
         if (other == null || GetType() != other.GetType())
