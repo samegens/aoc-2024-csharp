@@ -2,13 +2,8 @@
 
 namespace SolverTests;
 
-public class Tests
+public class SolverTests
 {
-    [SetUp]
-    public void Setup()
-    {
-    }
-
     [Test]
     public void TestSolvePart1()
     {
