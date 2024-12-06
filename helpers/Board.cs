@@ -27,4 +27,18 @@ public class Board
     public char this[Point p] => _tiles[p.X, p.Y];
 
     public bool Contains(Point p) => p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height;
+
+    public void Print()
+    {
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                char ch = _tiles[x, y];
+                Console.Write(ch);
+            }
+            Console.WriteLine();
+        }
+        Console.WriteLine();
+    }
 }

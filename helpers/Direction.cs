@@ -14,4 +14,12 @@ public static class DirectionHelpers
         [Direction.Down] = new Point(0, 1),
         [Direction.Left] = new Point(-1, 0),
     };
+
+    public static readonly Dictionary<Direction, char> Chars = new()
+    {
+        [Direction.Up] = '^',
+        [Direction.Right] = '>',
+        [Direction.Down] = 'v',
+        [Direction.Left] = '<',
+    };
 }
