@@ -2,35 +2,35 @@ namespace AoC;
 
 public class Rect
 {
-    private readonly Point _topLeft;
-    private readonly Point _bottomRight;
+    private readonly Point2dI _topLeft;
+    private readonly Point2dI _bottomRight;
 
     public int Width => _bottomRight.X - _topLeft.X + 1;
 
     public int Height => _topLeft.Y - _bottomRight.Y + 1;
 
-    public Point TopLeft => _topLeft;
+    public Point2dI TopLeft => _topLeft;
 
-    public Point BottomRight => _bottomRight;
+    public Point2dI BottomRight => _bottomRight;
 
-    public Rect(Point topLeft, Point bottomRight)
+    public Rect(Point2dI topLeft, Point2dI bottomRight)
     {
         _topLeft = topLeft;
         _bottomRight = bottomRight;
     }
 
-    public bool Contains(Point point)
+    public bool Contains(Point2dI point)
     {
         return point.X >= _topLeft.X && point.X <= _bottomRight.X &&
                point.Y <= _topLeft.Y && point.Y >= _bottomRight.Y;
     }
 
-    public bool IsLeftOf(Point point)
+    public bool IsLeftOf(Point2dI point)
     {
         return _bottomRight.X < point.X;
     }
 
-    public bool IsAbove(Point point)
+    public bool IsAbove(Point2dI point)
     {
         return _bottomRight.Y > point.Y;
     }

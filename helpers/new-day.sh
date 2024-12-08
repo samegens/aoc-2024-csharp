@@ -25,6 +25,8 @@ dotnet new nunit -n SolverTests
 dotnet sln "day$DAY.sln" add SolverTests/SolverTests.csproj
 dotnet add SolverTests/SolverTests.csproj reference Solver/Solver.csproj
 touch Solver/input.txt
-cp ../helpers/*.cs Solver/
+cp ../helpers/Solver/*.cs Solver/
 rm SolverTests/*.cs
 cp ../helpers/SolverTests/*.cs SolverTests
+
+echo Don\'t forget to paste the puzzle input in input.txt!

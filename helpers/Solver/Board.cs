@@ -24,9 +24,9 @@ public class Board
 
     public char this[int x, int y] => _tiles[x, y];
 
-    public char this[Point p] => _tiles[p.X, p.Y];
+    public char this[Point2dI p] => _tiles[p.X, p.Y];
 
-    public bool Contains(Point p) => p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height;
+    public bool Contains(Point2dI p) => p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height;
 
     public void Print()
     {
