@@ -17,9 +17,12 @@ public class Point
         Y = point.Y;
     }
 
-    public Point Move(int dX, int dY) => new Point(X + dX, Y + dY);
-    public Point Move(Point delta) => new Point(X + delta.X, Y + delta.Y);
+    public Point Move(int dX, int dY) => new(X + dX, Y + dY);
+    public Point Move(Point delta) => new(X + delta.X, Y + delta.Y);
     public Point Move(Direction direction) => Move(DirectionHelpers.Movements[direction]);
+
+    public static Point operator -(Point p1, Point p2) => new(p1.X - p2.X, p1.Y - p2.Y);
+    public static Point operator +(Point p1, Point p2) => new(p1.X + p2.X, p1.Y + p2.Y);
 
     public override string ToString()
     {
