@@ -1,8 +1,3 @@
-
-
-
-
-
 namespace AoC;
 
 public class FileSystem(List<FileSystem.Block> blocks)
