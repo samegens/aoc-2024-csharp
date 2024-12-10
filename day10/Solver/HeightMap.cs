@@ -1,5 +1,3 @@
-
-
 namespace AoC;
 
 public class HeightMap
