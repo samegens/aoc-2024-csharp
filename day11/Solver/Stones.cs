@@ -1,138 +1,68 @@
-
 namespace AoC;
 
-public class Stones : List<Stone>
+public class Stones
 {
-    private readonly Dictionary<(long, int), long> _numberGenerationToStoneCountMap = [];
+    private Dictionary<long, long> _frequencyMap = [];
 
-    public long TotalStoneCount
+    public long TotalStoneCount => _frequencyMap.Values.Sum();
+
+    public Stones(IEnumerable<long> stones)
     {
-        get
+        foreach (long stone in stones)
         {
-            long totalStoneCount = 0;
-            foreach (Stone stone in this)
-            {
-                if (stone.IsPlaceHolder)
-                {
-                    totalStoneCount += _numberGenerationToStoneCountMap[(stone.Number, stone.Generation)];
-                }
-                else
-                {
-                    totalStoneCount++;
-                }
-            }
-            return totalStoneCount;
+            IncreaseFrequencyCount(_frequencyMap, stone, 1);
         }
     }
 
-    public Stones(IEnumerable<Stone> stones) : base(stones) { }
-
     public static Stones Parse(string input)
     {
-        return new Stones(input
+        return new(input
                         .Split(' ')
-                        .Select(x => new Stone(long.Parse(x), 0)));
+                        .Select(long.Parse));
     }
 
     public void Blink(int n)
     {
-        PrecomputeNumberGenerations();
-        // Stones referenceStones = new(this);
         for (int i = 0; i < n; i++)
         {
-            // Console.WriteLine(i);
-            Blink(true);
-            // referenceStones.Blink(false);
-            // if (TotalStoneCount != referenceStones.TotalStoneCount)
-            // {
-            //     Console.WriteLine($"Mismatch at {i}:");
-            //     Print();
-            //     referenceStones.Print();
-            //     throw new Exception();
-            // }
-            //SAMTODO
-            // Print();
-            // foreach (Stone stone in this)
-            // {
-            //     if (_originalStones.Contains(stone.Number))
-            //     {
-            //         Console.WriteLine($"Found cycle! ({stone.Number})");
-            //     }
-            // }
+            Blink();
         }
     }
 
-    public void Blink(bool optimize = true)
+    public void Blink()
     {
-        List<Stone> oldStones = new(this);
-        Clear();
-        foreach (Stone stone in oldStones)
+        Dictionary<long, long> newFrequencyMap = [];
+        foreach ((long number, long frequency) in _frequencyMap)
         {
-            AddRange(stone.Blink());
-        }
-
-        if (optimize)
-        {
-            ReplaceKnownStonesByPlaceholders();
-        }
-    }
-
-    private void ReplaceKnownStonesByPlaceholders()
-    {
-        List<Stone> oldStones = new(this);
-        Clear();
-        foreach (Stone stone in oldStones)
-        {
-            if (_numberGenerationToStoneCountMap.ContainsKey((stone.Number, stone.Generation)))
+            int numberNrDigits = $"{number}".Length;
+            if (number == 0)
             {
-                Add(stone.AsPlaceholder());
+                IncreaseFrequencyCount(newFrequencyMap, 1, frequency);
+            }
+            else if (numberNrDigits % 2 == 0)
+            {
+                long firstNumber = long.Parse($"{number}"[..(numberNrDigits / 2)]);
+                long secondNumber = long.Parse($"{number}"[(numberNrDigits / 2)..]);
+                IncreaseFrequencyCount(newFrequencyMap, firstNumber, frequency);
+                IncreaseFrequencyCount(newFrequencyMap, secondNumber, frequency);
             }
             else
             {
-                Add(stone);
+                IncreaseFrequencyCount(newFrequencyMap, number * 2024, frequency);
             }
         }
+        _frequencyMap = newFrequencyMap;
     }
 
-    public void PrecomputeNumberGenerations()
+    private static void IncreaseFrequencyCount(Dictionary<long, long> frequencyMap, long number, long delta)
     {
-        List<Stones> stonesPerNumber = [];
-        for (int number = 0; number < 10; number++)
+        if (!frequencyMap.ContainsKey(number))
         {
-            _numberGenerationToStoneCountMap[(number, 0)] = 1;
-            stonesPerNumber.Add(Parse(number.ToString()));
+            frequencyMap[number] = delta;
         }
-        for (int generation = 1; generation < 75; generation++)
+        else
         {
-            for (int number = 0; number < 10; number++)
-            {
-                Stones nextGenerationStones = new([]);
-                stonesPerNumber[number].Blink();
-                long totalNrStones = 0;
-                foreach (Stone stone in stonesPerNumber[number])
-                {
-                    if (_numberGenerationToStoneCountMap.ContainsKey((stone.Number, stone.Generation)))
-                    {
-                        nextGenerationStones.Add(new Stone(stone.Number, stone.Generation, true));
-                        totalNrStones += _numberGenerationToStoneCountMap[(stone.Number, stone.Generation)];
-                    }
-                    else
-                    {
-                        nextGenerationStones.Add(stone);
-                        totalNrStones++;
-                    }
-                }
-                _numberGenerationToStoneCountMap[(number, generation)] = totalNrStones;
-                // Console.WriteLine($"{number} {generation}: {nextGenerationStones.Count}/{totalNrStones}");
-                // nextGenerationStones.Print();
-                stonesPerNumber[number] = nextGenerationStones;
-            }
+            frequencyMap[number] = frequencyMap[number] + delta;
         }
-        // Console.WriteLine(NumberGenerationToStoneCountMap);
-    }
-
-    private void Print()
-    {
-        Console.WriteLine(string.Join(',', this.Select(s => s.Number)));
     }
 }

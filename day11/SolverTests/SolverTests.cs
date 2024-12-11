@@ -18,17 +18,17 @@ public class SolverTests
         Assert.That(result, Is.EqualTo(55312));
     }
 
-    // [Test]
-    // public void TestSolvePart2()
-    // {
-    //     // Arrange
-    //     string input = "125 17";
-    //     Solver sut = new(input);
+    [Test]
+    public void TestSolvePart2()
+    {
+        // Arrange
+        string input = "125 17";
+        Solver sut = new(input);
 
-    //     // Act
-    //     int result = sut.SolvePart2();
+        // Act
+        long result = sut.SolvePart2();
 
-    //     // Assert
-    //     Assert.That(result, Is.EqualTo(0));
-    // }
+        // Assert
+        Assert.That(result, Is.EqualTo(65601038650482));
+    }
 }

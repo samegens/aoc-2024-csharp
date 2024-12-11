@@ -13,6 +13,6 @@ public class Solver(string line)
     {
         Stones stones = Stones.Parse(line);
         stones.Blink(75);
-        return stones.Count;
+        return stones.TotalStoneCount;
     }
 }
