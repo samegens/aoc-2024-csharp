@@ -32,34 +32,15 @@ public record class Machine(Point2dL ButtonADelta, Point2dL ButtonBDelta, Point2
 
     public long Play()
     {
-        long D = ButtonADelta.X * ButtonBDelta.Y - ButtonBDelta.X * ButtonADelta.Y;
-        long Dx = PrizePosition.X * ButtonBDelta.Y - PrizePosition.Y * ButtonBDelta.X;
-        long Dy = ButtonADelta.X * PrizePosition.Y - ButtonADelta.Y * PrizePosition.X;
+        (bool hasSolution, long nrAPresses, long nrBPresses) = Algorithms.SolveLinearEquations2x2(
+            ButtonADelta.X, ButtonBDelta.X, PrizePosition.X,
+            ButtonADelta.Y, ButtonBDelta.Y, PrizePosition.Y);
 
-        if (Dx % D != 0 || Dy % D != 0)
+        if (!hasSolution)
         {
             return 0;
         }
 
-        long nrAPresses = Dx / D;
-        long nrBPresses = Dy / D;
-
         return 3 * nrAPresses + nrBPresses;
-        // long minNrTokens = long.MaxValue;
-        // for (long nrAPresses = 1; nrAPresses <= 100; nrAPresses++)
-        // {
-        //     long prizeX = PrizePosition.X - nrAPresses * ButtonADelta.X;
-        //     long prizeY = PrizePosition.Y - nrAPresses * ButtonADelta.Y;
-        //     if (prizeX % ButtonBDelta.X == 0 && prizeY % ButtonBDelta.Y == 0)
-        //     {
-        //         long nrBPresses = prizeX / ButtonBDelta.X;
-        //         if (prizeY / ButtonBDelta.Y == nrBPresses)
-        //         {
-        //             long nrTokens = 3 * nrAPresses + nrBPresses;
-        //             minNrTokens = Math.Min(minNrTokens, nrTokens);
-        //         }
-        //     }
-        // }
-        // return minNrTokens;
     }
 }

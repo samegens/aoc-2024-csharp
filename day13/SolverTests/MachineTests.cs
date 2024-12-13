@@ -1,6 +1,5 @@
 global using Point2dL = AoC.Point2d<long>;
 
-
 using AoC;
 
 namespace SolverTests;
