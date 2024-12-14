@@ -24,11 +24,11 @@ public class HeightMap
 
     public int this[int x, int y] => _tiles[x, y];
 
-    public int this[Point2dI p] => _tiles[p.X, p.Y];
+    public int this[Point2d p] => _tiles[p.X, p.Y];
 
-    public bool Contains(Point2dI p) => p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height;
+    public bool Contains(Point2d p) => p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height;
 
-    public IEnumerable<Point2dI> Points
+    public IEnumerable<Point2d> Points
     {
         get
         {
@@ -36,7 +36,7 @@ public class HeightMap
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    yield return new Point2dI(x, y);
+                    yield return new Point2d(x, y);
                 }
             }
         }

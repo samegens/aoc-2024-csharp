@@ -2,12 +2,12 @@ namespace AoC;
 
 public class GraphNode
 {
-    public GraphNode(Point2dI pos)
+    public GraphNode(Point2d pos)
     {
         Pos = pos;
     }
 
-    public Point2dI Pos { get; set; }
+    public Point2d Pos { get; set; }
 
     public override string ToString()
     {
@@ -62,7 +62,7 @@ public class NonDirectedGraph
 {
     private readonly Dictionary<GraphNode, List<Edge>> _adjacencyList = new();
     // Dictionary to speed up position lookups
-    private readonly Dictionary<Point2dI, GraphNode> _pointToNodeMap = new();
+    private readonly Dictionary<Point2d, GraphNode> _pointToNodeMap = new();
 
     public NonDirectedGraph()
     {
@@ -115,9 +115,9 @@ public class NonDirectedGraph
         return _adjacencyList[vertex].Select(e => e.First).ToList();
     }
 
-    public bool Contains(Point2dI pos) => _pointToNodeMap.ContainsKey(pos);
+    public bool Contains(Point2d pos) => _pointToNodeMap.ContainsKey(pos);
 
-    public GraphNode GetAt(Point2dI pos)
+    public GraphNode GetAt(Point2d pos)
     {
         return _pointToNodeMap[pos];
     }
@@ -131,7 +131,7 @@ public class NonDirectedGraph
         }
     }
 
-    public int ComputeShortestPathFromStartToEnd(Point2dI start, Point2dI end)
+    public int ComputeShortestPathFromStartToEnd(Point2d start, Point2d end)
     {
         GraphNode endNode = GetAt(end);
 

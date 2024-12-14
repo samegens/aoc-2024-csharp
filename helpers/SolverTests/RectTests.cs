@@ -1,5 +1,3 @@
-global using Point2dI = AoC.Point2d<int>;
-
 using AoC;
 
 namespace SolverTests;
@@ -11,10 +9,10 @@ public class RectTests
     public void TestContains(int x, int y, bool expected)
     {
         // Arrange
-        Rect sut = new(new Point2dI(0, 0), new Point2dI(2, 1));
+        Rect sut = new(new Point2d(0, 0), new Point2d(2, 1));
 
         // Act
-        bool actual = sut.Contains(new Point2dI(x, y));
+        bool actual = sut.Contains(new Point2d(x, y));
 
         // Assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -24,10 +22,10 @@ public class RectTests
     public void TestWidth()
     {
         // Arrange
-        Rect sut = new(new Point2dI(1, 2), new Point2dI(3, 5));
+        Rect sut = new(new Point2d(1, 2), new Point2d(3, 5));
 
         // Act
-        int actual = sut.Width;
+        long actual = sut.Width;
 
         // Assert
         Assert.That(actual, Is.EqualTo(3));
@@ -37,10 +35,10 @@ public class RectTests
     public void TestHeight()
     {
         // Arrange
-        Rect sut = new(new Point2dI(1, 2), new Point2dI(3, 5));
+        Rect sut = new(new Point2d(1, 2), new Point2d(3, 5));
 
         // Act
-        int actual = sut.Height;
+        long actual = sut.Height;
 
         // Assert
         Assert.That(actual, Is.EqualTo(4));

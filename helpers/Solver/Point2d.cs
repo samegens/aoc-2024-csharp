@@ -1,22 +1,19 @@
-global using Point2dI = AoC.Point2d<int>;
-global using Point2dL = AoC.Point2d<long>;
-
 namespace AoC;
 
-public record Point2d<T>(T X, T Y) where T : System.Numerics.IBinaryInteger<T>
+public record Point2d(long X, long Y)
 {
-    public Point2d(Point2d<T> point)
+    public Point2d(Point2d point)
     {
         X = point.X;
         Y = point.Y;
     }
 
-    public Point2d<T> Move(T dX, T dY) => new(X + dX, Y + dY);
-    public Point2d<T> Move(Point2dI delta) => new(X + T.CreateChecked(delta.X), Y + T.CreateChecked(delta.Y));
-    public Point2d<T> Move(Direction direction) => Move(DirectionHelpers.Movements[direction]);
+    public Point2d Move(long dX, long dY) => new(X + dX, Y + dY);
+    public Point2d Move(Point2d delta) => new(X + delta.X, Y + delta.Y);
+    public Point2d Move(Direction direction) => Move(DirectionHelpers.Movements[direction]);
 
-    public static Point2d<T> operator -(Point2d<T> p1, Point2d<T> p2) => new(p1.X - p2.X, p1.Y - p2.Y);
-    public static Point2d<T> operator +(Point2d<T> p1, Point2d<T> p2) => new(p1.X + p2.X, p1.Y + p2.Y);
+    public static Point2d operator -(Point2d p1, Point2d p2) => new(p1.X - p2.X, p1.Y - p2.Y);
+    public static Point2d operator +(Point2d p1, Point2d p2) => new(p1.X + p2.X, p1.Y + p2.Y);
 
     public override string ToString()
     {

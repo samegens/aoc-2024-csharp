@@ -7,12 +7,12 @@ public enum Direction
 
 public static class DirectionHelpers
 {
-    public static readonly Dictionary<Direction, Point2dI> Movements = new()
+    public static readonly Dictionary<Direction, Point2d> Movements = new()
     {
-        [Direction.Up] = new Point2dI(0, -1),
-        [Direction.Right] = new Point2dI(1, 0),
-        [Direction.Down] = new Point2dI(0, 1),
-        [Direction.Left] = new Point2dI(-1, 0),
+        [Direction.Up] = new Point2d(0, -1),
+        [Direction.Right] = new Point2d(1, 0),
+        [Direction.Down] = new Point2d(0, 1),
+        [Direction.Left] = new Point2d(-1, 0),
     };
 
     public static readonly Dictionary<Direction, char> Chars = new()
