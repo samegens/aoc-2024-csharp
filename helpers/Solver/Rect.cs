@@ -7,7 +7,7 @@ public class Rect
 
     public int Width => _bottomRight.X - _topLeft.X + 1;
 
-    public int Height => _topLeft.Y - _bottomRight.Y + 1;
+    public int Height => _bottomRight.Y - _topLeft.Y + 1;
 
     public Point2dI TopLeft => _topLeft;
 
@@ -22,7 +22,7 @@ public class Rect
     public bool Contains(Point2dI point)
     {
         return point.X >= _topLeft.X && point.X <= _bottomRight.X &&
-               point.Y <= _topLeft.Y && point.Y >= _bottomRight.Y;
+               point.Y >= _topLeft.Y && point.Y <= _bottomRight.Y;
     }
 
     public bool IsLeftOf(Point2dI point)
