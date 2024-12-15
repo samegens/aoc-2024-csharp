@@ -22,4 +22,26 @@ public static class DirectionHelpers
         [Direction.Down] = 'v',
         [Direction.Left] = '<',
     };
+
+    public static readonly Dictionary<char, Direction> CharToDirectionMap = new()
+    {
+        ['^'] = Direction.Up,
+        ['>'] = Direction.Right,
+        ['v'] = Direction.Down,
+        ['<'] = Direction.Left
+    };
+
+    public static readonly Dictionary<Direction, Direction> Opposite = new()
+    {
+        [Direction.Up] = Direction.Down,
+        [Direction.Right] = Direction.Left,
+        [Direction.Down] = Direction.Up,
+        [Direction.Left] = Direction.Right
+    };
+
+    public static List<Direction> Parse(List<string> lines)
+    {
+        string input = string.Join("", lines.Select(l => l.Trim()));
+        return input.Select(ch => CharToDirectionMap[ch]).ToList();
+    }
 }
