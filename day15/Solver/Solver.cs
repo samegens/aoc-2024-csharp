@@ -9,8 +9,10 @@ public class Solver(List<string> lines)
         return board.GetGpsScore();
     }
 
-    public int SolvePart2()
+    public long SolvePart2()
     {
-        return 0;
+        (WideBoard board, List<Direction> directions) = WideBoard.ParseWideBoardAndDirections(lines);
+        board.MoveRobot(directions);
+        return board.GetGpsScore();
     }
 }
