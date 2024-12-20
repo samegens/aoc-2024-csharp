@@ -48,5 +48,4 @@ public class Point2dTests
         // Assert
         Assert.That(actual, Is.EqualTo(expectedDistance));
     }
-
 }
