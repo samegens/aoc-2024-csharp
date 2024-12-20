@@ -40,6 +40,8 @@ public class Board
 
     public bool Contains(Point2d p) => p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height;
 
+    public bool CanBeEntered(Point2d p) => Contains(p) && this[p] != '#';
+
     public override string ToString()
     {
         StringBuilder sb = new();
