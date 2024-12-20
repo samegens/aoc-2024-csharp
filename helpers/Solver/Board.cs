@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace AoC;
 
 public class Board
@@ -5,6 +7,8 @@ public class Board
     private readonly char[,] _tiles;
     public int Width { get; private set; }
     public int Height { get; private set; }
+    public Point2d Start { get; private set; } = new Point2d(-1, -1);
+    public Point2d End { get; private set; } = new Point2d(-1, -1);
 
     public Board(List<string> lines)
     {
@@ -18,6 +22,14 @@ public class Board
             for (int x = 0; x < Width; x++)
             {
                 _tiles[x, y] = line[x];
+                if (line[x] == 'S')
+                {
+                    Start = new Point2d(x, y);
+                }
+                else if (line[x] == 'E')
+                {
+                    End = new Point2d(x, y);
+                }
             }
         }
     }
@@ -28,17 +40,33 @@ public class Board
 
     public bool Contains(Point2d p) => p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height;
 
-    public void Print()
+    public override string ToString()
     {
+        StringBuilder sb = new();
         for (int y = 0; y < Height; y++)
         {
             for (int x = 0; x < Width; x++)
             {
-                char ch = _tiles[x, y];
-                Console.Write(ch);
+                if (Start.X == x && Start.Y == x)
+                {
+                    sb.Append('S');
+                }
+                else if (End.X == x && End.Y == y)
+                {
+                    sb.Append('E');
+                }
+                else
+                {
+                    sb.Append(_tiles[x, y]);
+                }
             }
-            Console.WriteLine();
+            sb.AppendLine();
         }
-        Console.WriteLine();
+        return sb.ToString();
+    }
+
+    public void Print()
+    {
+        Console.WriteLine(ToString());
     }
 }
