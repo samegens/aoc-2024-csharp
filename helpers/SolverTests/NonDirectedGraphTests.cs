@@ -23,4 +23,36 @@ public class NonDirectedGraphTests
         // Assert
         Assert.That(string.IsNullOrEmpty(actual), Is.False);
     }
+
+    [Test]
+    public void TestGetShortestPathFromStartToEnd()
+    {
+        // Arrange
+        List<string> input = """
+        ###############
+        #...#...#.....#
+        #.#.#.#.#.###.#
+        #S#...#.#.#...#
+        #######.#.#.###
+        #######.#.#...#
+        #######.#.###.#
+        ###..E#...#...#
+        ###.#######.###
+        #...###...#...#
+        #.#####.#.###.#
+        #.#...#.#.#...#
+        #.#.#.#.#.#.###
+        #...#...#...###
+        ###############
+        """.Split('\n').ToList();
+        Board board = new(input);
+        NonDirectedGraph sut = NonDirectedGraph.CreateGraphFromBoard(board);
+
+        // Act
+        int actual = sut.ComputeShortestPathFromStartToEnd(board.Start, board.End);
+
+        // Assert
+        Assert.That(actual, Is.EqualTo(84));
+    }
+
 }
