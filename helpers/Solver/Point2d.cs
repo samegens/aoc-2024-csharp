@@ -16,6 +16,8 @@ public record Point2d(long X, long Y)
     public static Point2d operator -(Point2d p1, Point2d p2) => new(p1.X - p2.X, p1.Y - p2.Y);
     public static Point2d operator +(Point2d p1, Point2d p2) => new(p1.X + p2.X, p1.Y + p2.Y);
 
+    public long ManhattanDistanceTo(Point2d p2) => Math.Abs(p2.X - X) + Math.Abs(p2.Y - Y);
+
     public override string ToString()
     {
         return $"({X},{Y})";
