@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace AoC;
 
 public class GraphNode
@@ -105,6 +107,8 @@ public class NonDirectedGraph
         return _adjacencyList[vertex];
     }
 
+    public List<Edge> GetEdgesTo(Point2d p) => GetEdges(_pointToNodeMap[p]);
+
     public List<GraphNode> GetNeighbors(GraphNode vertex)
     {
         if (!_adjacencyList.ContainsKey(vertex))
@@ -167,5 +171,130 @@ public class NonDirectedGraph
         }
 
         return shortestPaths[endNode];
+    }
+
+    public string ToHtml(Board board)
+    {
+        var html = new StringBuilder();
+
+        html.AppendLine("""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Graph Visualization</title>
+            <style>
+                table { border-collapse: collapse; margin-top: 10px; }
+                td { width: 25px; height: 25px; text-align: center; border: 1px solid lightgray; cursor: pointer; }
+                .wall { background-color: #333; color: white; }
+                .clickable { background-color: #ddd; }
+                .start { background-color: green; color: white; }
+                .end { background-color: red; color: white; }
+                .popup {
+                    position: absolute;
+                    background: #fff;
+                    border: 1px solid #aaa;
+                    padding: 5px;
+                    border-radius: 4px;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+                    pointer-events: none;
+                    font-family: monospace;
+                    font-size: 14px;
+                    z-index: 1000;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Graph Visualization</h1>
+            <p>Click on any '.', 'S', or 'E' to view graph node information.</p>
+            <table>
+        """);
+
+        // Generate the board as an HTML table
+        for (int y = 0; y < board.Height; y++)
+        {
+            html.AppendLine("    <tr>");
+            for (int x = 0; x < board.Width; x++)
+            {
+                char tile = board[x, y];
+                string cssClass = tile switch
+                {
+                    '#' => "wall",
+                    'S' => "start clickable",
+                    'E' => "end clickable",
+                    '.' => "clickable",
+                    _ => ""
+                };
+
+                html.Append($"        <td class='{cssClass}'");
+
+                if (cssClass.Contains("clickable"))
+                {
+                    List<Edge> edges = GetEdgesTo(new Point2d(x, y));
+                    string nodeInfo = edges.Any()
+                        ? string.Join(", ", edges.Select(e => $"{e.Cost}"))
+                        : "Node not reachable";
+                    html.Append($" onclick=\"showInfo('{x}', '{y}', `{nodeInfo}`, event)\"");
+                }
+
+                html.AppendLine($">{tile}</td>");
+            }
+            html.AppendLine("    </tr>");
+        }
+
+        html.AppendLine("""
+            </table>
+            <script>
+                let popup;
+                function showInfo(x, y, info, event) {
+                    if (popup) { popup.remove(); }
+                    popup = document.createElement('div');
+                    popup.className = 'popup';
+                    popup.innerHTML = 
+                        `<strong>Coordinates:</strong> (${x}, ${y})<br>` +
+                        `<strong>GraphNode Info:</strong> ${info}`;
+                    popup.style.left = `${event.pageX + 10}px`;
+                    popup.style.top = `${event.pageY + 10}px`;
+                    document.body.appendChild(popup);
+                    setTimeout(() => popup.remove(), 3000);
+                }
+            </script>
+        </body>
+        </html>
+        """);
+
+        return html.ToString();
+    }
+
+    public static NonDirectedGraph CreateGraphFromBoard(Board board)
+    {
+        NonDirectedGraph graph = new();
+        HashSet<Point2d> visitedTiles = [];
+        AddTileToGraph(board.Start, graph, board, visitedTiles);
+        return graph;
+    }
+
+    private static void AddTileToGraph(Point2d p, NonDirectedGraph graph, Board board, HashSet<Point2d> visitedTiles)
+    {
+        GraphNode thisNode = new(p);
+        graph.AddVertex(thisNode);
+        visitedTiles.Add(p);
+
+        const int movementCost = 1;
+
+        foreach ((_, Point2d delta) in DirectionHelpers.Movements)
+        {
+            Point2d newP = p.Move(delta);
+            if (board.CanBeEntered(newP))
+            {
+                if (!visitedTiles.Contains(newP))
+                {
+                    AddTileToGraph(newP, graph, board, visitedTiles);
+                }
+                GraphNode nextNode = graph.GetAt(newP);
+                graph.AddEdge(thisNode, nextNode, movementCost);
+            }
+        }
     }
 }
