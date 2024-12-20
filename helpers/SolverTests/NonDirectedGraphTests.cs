@@ -54,5 +54,4 @@ public class NonDirectedGraphTests
         // Assert
         Assert.That(actual, Is.EqualTo(84));
     }
-
 }
