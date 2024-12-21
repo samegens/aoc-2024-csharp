@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/day17/Solver/bin/Debug/net9.0/Solver.dll",
+            "program": "${workspaceFolder}/day21/Solver/bin/Debug/net9.0/Solver.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/day17/Solver",
+            "cwd": "${workspaceFolder}/day21/Solver",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false
