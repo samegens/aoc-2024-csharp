@@ -4,15 +4,18 @@ namespace SolverTests;
 
 public class KeypadTests
 {
-    [TestCase("029A", 68)]
-    [TestCase("980A", 60)]
-    [TestCase("179A", 68)]
-    [TestCase("456A", 64)]
-    [TestCase("379A", 64)]
-    public void TestGetHumanSequenceLength(string input, long expected)
+    [TestCase("0A", 1, 4)]
+    [TestCase("0A", 2, 12)]
+    [TestCase("0A", 3, 28)]
+    [TestCase("029A", 3, 68)]
+    [TestCase("980A", 3, 60)]
+    [TestCase("179A", 3, 68)]
+    [TestCase("456A", 3, 64)]
+    [TestCase("379A", 3, 64)]
+    public void TestGetHumanSequenceLength(string input, int nrRobots, long expected)
     {
         // Arrange
-        Keypad sut = new(3);
+        Keypad sut = new(nrRobots);
 
         // Act
         long actual = sut.GetHumanSequenceLength(input);

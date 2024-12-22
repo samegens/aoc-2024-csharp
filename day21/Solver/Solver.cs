@@ -11,6 +11,6 @@ public class Solver(List<string> lines)
     public long SolvePart2()
     {
         return lines.
-            Sum(s => new Keypad(25).GetHumanSequenceLength(s) * int.Parse(s.Trim('A')));
+            Sum(s => new Keypad(26).GetHumanSequenceLength(s) * int.Parse(s.Trim('A')));
     }
 }

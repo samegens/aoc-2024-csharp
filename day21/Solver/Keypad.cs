@@ -1,6 +1,3 @@
-
-using System.Text;
-
 namespace AoC;
 
 public class Keypad(int nrRobots)
@@ -20,7 +17,7 @@ public class Keypad(int nrRobots)
         ['A'] = new Point2d(2, 3)
     };
     private const int InvalidYOfLock = 3;
-    private readonly Dictionary<(char, char), string> optimalLockRoute = GenerateOptimalLockRoute(lockCharToPointMap, InvalidYOfLock);
+    private readonly Dictionary<(char, char), List<string>> possibleLockMoves = GeneratePossibleMoves(lockCharToPointMap, InvalidYOfLock);
 
     private static readonly Dictionary<char, Point2d> directionalKeypadCharToPointMap = new()
     {
@@ -31,11 +28,13 @@ public class Keypad(int nrRobots)
         ['>'] = new Point2d(2, 1)
     };
     private const int InvalidYOfPad = 0;
-    private readonly Dictionary<(char, char), string> optimalPadRoute = GenerateOptimalLockRoute(directionalKeypadCharToPointMap, InvalidYOfPad);
+    private readonly Dictionary<(char, char), List<string>> possiblePadMoves = GeneratePossibleMoves(directionalKeypadCharToPointMap, InvalidYOfPad);
 
-    private static Dictionary<(char, char), string> GenerateOptimalLockRoute(Dictionary<char, Point2d> charToPointMap, int yOfInvalidTile)
+    private readonly Dictionary<(string, int), long> memoizationCache = [];
+
+    private static Dictionary<(char, char), List<string>> GeneratePossibleMoves(Dictionary<char, Point2d> charToPointMap, int yOfInvalidTile)
     {
-        Dictionary<(char, char), string> optimalRoute = [];
+        Dictionary<(char, char), List<string>> possibleRoutes = [];
 
         foreach (char start in charToPointMap.Keys)
         {
@@ -43,40 +42,26 @@ public class Keypad(int nrRobots)
             {
                 if (start != end)
                 {
+                    possibleRoutes[(start, end)] = [];
+
                     Point2d p1 = charToPointMap[start];
                     Point2d p2 = charToPointMap[end];
                     List<string> sequences = GetCommandSequences(p1, p2, yOfInvalidTile);
-                    // Now we have to choose the one that results in the shortest meta command sequence.
-                    int shortestLength = int.MaxValue;
-                    string shortestSequence = "";
-                    for (int i = 0; i < sequences.Count; i++)
-                    {
-                        string sequence = sequences[i];
-                        List<string> metaSequences = GetMetaCommandSequences(sequence, 0, InvalidYOfPad);
-                        foreach (string metaSequence in metaSequences)
-                        {
-                            if (metaSequence.Length < shortestLength)
-                            {
-                                shortestLength = metaSequence.Length;
-                                shortestSequence = sequence;
-                            }
-                        }
-                    }
-                    optimalRoute[(start, end)] = shortestSequence;
+                    possibleRoutes[(start, end)] = sequences;
                 }
                 else
                 {
-                    optimalRoute[(start, end)] = "A";
+                    possibleRoutes[(start, end)] = ["A"];
                 }
             }
         }
 
-        return optimalRoute;
+        return possibleRoutes;
     }
 
     public long GetHumanSequenceLength(string code)
     {
-        return GetMinHumanSequenceLength($"A{code}", 0, nrRobots - 1);
+        return GetMinHumanSequenceLength($"A{code}", nrRobots);
     }
 
     public static void PrintCommandOutput(string commands)
@@ -189,44 +174,71 @@ public class Keypad(int nrRobots)
         return resultSequences;
     }
 
-    public long GetMinHumanSequenceLength(string code, int codeIndex, int nrRobots)
+    public long GetMinHumanSequenceLength(string code, int nrRobots)
     {
-        Dictionary<(string, int), long> memoizationCache = [];
-        long sequenceLength = 0;
-        for (int i = 0; i < code.Length - 1; i++)
-        {
-            char start = code[i];
-            char end = code[i + 1];
-            string shortestRoute = optimalLockRoute[(start, end)];
-            sequenceLength += GetMetaSequenceLength($"A{shortestRoute}", nrRobots, memoizationCache);
-        }
-        return sequenceLength;
-    }
-
-    private long GetMetaSequenceLength(string sequence, int nrRobots, Dictionary<(string, int), long> memoizationCache)
-    {
-        if (nrRobots == 0)
-        {
-            // 'A' was added to the start so we shouldn't count it in the final sequence length.
-            return sequence.Length - 1;
-        }
-
-        if (memoizationCache.TryGetValue((sequence, nrRobots), out long length))
+        if (memoizationCache.TryGetValue((code, nrRobots), out long length))
         {
             return length;
         }
 
-        long sequenceLength = 0;
-        for (int i = 0; i < sequence.Length - 1; i++)
+        if (nrRobots == 0)
         {
-            char start = sequence[i];
-            char end = sequence[i + 1];
-            string shortestRoute = optimalPadRoute[(start, end)];
-            sequenceLength += GetMetaSequenceLength($"A{shortestRoute}", nrRobots - 1, memoizationCache);
+            // Don't count the 'A' we prepended to be able to compute the transition
+            // from the start position of the robot's arm.
+            return code.Length - 1;
         }
 
-        memoizationCache[(sequence, nrRobots)] = sequenceLength;
+        List<List<string>> possibleMovesPerTileTransition = [];
+        Dictionary<(char, char), List<string>> possibleMovesDict = char.IsAsciiDigit(code[1]) ? possibleLockMoves : possiblePadMoves;
+        for (int i = 0; i < code.Length - 1; i++)
+        {
+            char start = code[i];
+            char end = code[i + 1];
+            possibleMovesPerTileTransition.Add(possibleMovesDict[(start, end)]);
+        }
+
+        long sequenceLength = long.MaxValue;
+        List<List<string>> movesToTry = GenerateMovesToTry(possibleMovesPerTileTransition);
+        foreach (List<string> moveToTry in movesToTry)
+        {
+            long thisSequenceLength = moveToTry.Sum(m => GetMinHumanSequenceLength($"A{m}", nrRobots - 1));
+            if (thisSequenceLength < sequenceLength)
+            {
+                sequenceLength = thisSequenceLength;
+            }
+        }
+
+        memoizationCache[(code, nrRobots)] = sequenceLength;
+
         return sequenceLength;
+    }
+
+    private List<List<string>> GenerateMovesToTry(List<List<string>> possibleMovesPerTileTransition)
+    {
+        if (possibleMovesPerTileTransition.Count == 1)
+        {
+            List<List<string>> result = [];
+            foreach (string move in possibleMovesPerTileTransition[0])
+            {
+                result.Add([move]);
+            }
+            return result;
+        }
+
+        // Each position in possibleMovesPerTileTransition contains one or two possible moves to make the transition.
+        // We have to generate all possible combinations.
+        List<List<string>> movesToTry = [];
+        foreach (string move in possibleMovesPerTileTransition[0])
+        {
+            List<List<string>> restMoves = GenerateMovesToTry(possibleMovesPerTileTransition.Skip(1).ToList());
+            foreach (List<string> restMove in restMoves)
+            {
+                List<string> moves = [move];
+                moves.AddRange(restMove);
+                movesToTry.Add(moves);
+            }
+        }
+        return movesToTry;
     }
 
     public static List<string> GetHumanSequences(char c1, char c2, int nrRobots)

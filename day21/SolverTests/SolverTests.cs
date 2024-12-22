@@ -35,6 +35,6 @@ public class SolverTests
         long result = sut.SolvePart2();
 
         // Assert
-        Assert.That(result, Is.EqualTo(175396398527088));
+        Assert.That(result, Is.EqualTo(154115708116294));
     }
 }
