@@ -3,7 +3,7 @@ using System.Text;
 
 namespace AoC;
 
-public class Keypad
+public class Keypad(int nrRobots)
 {
     private static readonly Dictionary<char, Point2d> lockCharToPointMap = new()
     {
@@ -19,6 +19,9 @@ public class Keypad
         ['9'] = new Point2d(2, 0),
         ['A'] = new Point2d(2, 3)
     };
+    private const int InvalidYOfLock = 3;
+    private readonly Dictionary<(char, char), string> optimalLockRoute = GenerateOptimalLockRoute(lockCharToPointMap, InvalidYOfLock);
+
     private static readonly Dictionary<char, Point2d> directionalKeypadCharToPointMap = new()
     {
         ['^'] = new Point2d(1, 0),
@@ -27,131 +30,53 @@ public class Keypad
         ['v'] = new Point2d(1, 1),
         ['>'] = new Point2d(2, 1)
     };
+    private const int InvalidYOfPad = 0;
+    private readonly Dictionary<(char, char), string> optimalPadRoute = GenerateOptimalLockRoute(directionalKeypadCharToPointMap, InvalidYOfPad);
 
-    public static Dictionary<string, string> LockSubstitutions { get; } = GenerateLockSubstitutions();
-    public static Dictionary<string, string> DirectionalKeypadSubstitutions { get; } = GenerateDirectionalKeypadSubstitutions();
-
-    private static Dictionary<string, string> GenerateLockSubstitutions()
+    private static Dictionary<(char, char), string> GenerateOptimalLockRoute(Dictionary<char, Point2d> charToPointMap, int yOfInvalidTile)
     {
-        Dictionary<string, string> substitutions = [];
-        foreach (char start in "0123456789A")
+        Dictionary<(char, char), string> optimalRoute = [];
+
+        foreach (char start in charToPointMap.Keys)
         {
-            foreach (char end in "0123456789A")
+            foreach (char end in charToPointMap.Keys)
             {
-                (string substitutionSrc, string substitutionDst) = GenerateLockSubstitutionsFor(start, end);
-                substitutions[substitutionSrc] = substitutionDst;
+                if (start != end)
+                {
+                    Point2d p1 = charToPointMap[start];
+                    Point2d p2 = charToPointMap[end];
+                    List<string> sequences = GetCommandSequences(p1, p2, yOfInvalidTile);
+                    // Now we have to choose the one that results in the shortest meta command sequence.
+                    int shortestLength = int.MaxValue;
+                    string shortestSequence = "";
+                    for (int i = 0; i < sequences.Count; i++)
+                    {
+                        string sequence = sequences[i];
+                        List<string> metaSequences = GetMetaCommandSequences(sequence, 0, InvalidYOfPad);
+                        foreach (string metaSequence in metaSequences)
+                        {
+                            if (metaSequence.Length < shortestLength)
+                            {
+                                shortestLength = metaSequence.Length;
+                                shortestSequence = sequence;
+                            }
+                        }
+                    }
+                    optimalRoute[(start, end)] = shortestSequence;
+                }
+                else
+                {
+                    optimalRoute[(start, end)] = "A";
+                }
             }
         }
 
-        return substitutions;
+        return optimalRoute;
     }
 
-    private static (string src, string dst) GenerateLockSubstitutionsFor(char start, char end)
+    public long GetHumanSequenceLength(string code)
     {
-        string substitutionSrc = $"{start}{end}";
-        string substitutionDst = "";
-        Point2d delta = lockCharToPointMap[end] - lockCharToPointMap[start];
-
-        if (delta.X > 0)
-        {
-            substitutionDst += new string('>', (int)delta.X);
-        }
-
-        if (delta.Y > 0)
-        {
-            substitutionDst += new string('v', (int)delta.Y);
-        }
-        else if (delta.Y < 0)
-        {
-            substitutionDst += new string('^', (int)-delta.Y);
-        }
-
-        if (delta.X < 0)
-        {
-            substitutionDst += new string('<', (int)-delta.X);
-        }
-
-        substitutionDst += 'A';
-
-        return (substitutionSrc, substitutionDst);
-    }
-
-    private static Dictionary<string, string> GenerateDirectionalKeypadSubstitutions()
-    {
-        Dictionary<string, string> substitutions = [];
-        foreach (char start in "<>^vA")
-        {
-            foreach (char end in "<>^vA")
-            {
-                (string substitutionSrc, string substitutionDst) = GenerateDirectionalKeypadSubstitutionsFor(start, end);
-                substitutions[substitutionSrc] = substitutionDst;
-            }
-        }
-
-        return substitutions;
-    }
-
-    private static (string src, string dst) GenerateDirectionalKeypadSubstitutionsFor(char start, char end)
-    {
-        string substitutionSrc = $"{start}{end}";
-        string substitutionDst = "";
-        Point2d p1 = directionalKeypadCharToPointMap[start];
-        Point2d p2 = directionalKeypadCharToPointMap[end];
-        Point2d delta = p2 - p1;
-
-        // To prevent crossing the gap we only do x-movement first when moving right.
-        if (delta.X > 0)
-        {
-            substitutionDst += new string('>', (int)delta.X);
-        }
-
-        if (delta.Y > 0)
-        {
-            substitutionDst += new string('v', (int)delta.Y);
-        }
-        else if (delta.Y < 0)
-        {
-            substitutionDst += new string('^', (int)-delta.Y);
-        }
-
-        if (delta.X < 0)
-        {
-            substitutionDst += new string('<', (int)-delta.X);
-        }
-
-        substitutionDst += 'A';
-
-        return (substitutionSrc, substitutionDst);
-    }
-
-    public static string GetLockCommands(string code)
-    {
-        StringBuilder lockCommands = new();
-        code = $"A{code}";
-        for (int i = 0; i < code.Length - 1; i++)
-        {
-            string substitutionSrc = $"{code[i]}{code[i + 1]}";
-            lockCommands.Append(LockSubstitutions[substitutionSrc]);
-        }
-        return lockCommands.ToString();
-    }
-
-    public static string GetDirectionKeypadCommands(string code)
-    {
-        StringBuilder commands = new();
-        code = $"A{code}";
-        for (int i = 0; i < code.Length - 1; i++)
-        {
-            string substitutionSrc = $"{code[i]}{code[i + 1]}";
-            commands.Append(DirectionalKeypadSubstitutions[substitutionSrc]);
-        }
-        return commands.ToString();
-    }
-
-    public static int GetHumanSequenceLength(string code, int nrRobots)
-    {
-        List<string> sequences = GetHumanSequences($"A{code}", 0, nrRobots);
-        return sequences.Min(s => s.Length);
+        return GetMinHumanSequenceLength($"A{code}", 0, nrRobots - 1);
     }
 
     public static void PrintCommandOutput(string commands)
@@ -262,6 +187,46 @@ public class Keypad
         }
 
         return resultSequences;
+    }
+
+    public long GetMinHumanSequenceLength(string code, int codeIndex, int nrRobots)
+    {
+        Dictionary<(string, int), long> memoizationCache = [];
+        long sequenceLength = 0;
+        for (int i = 0; i < code.Length - 1; i++)
+        {
+            char start = code[i];
+            char end = code[i + 1];
+            string shortestRoute = optimalLockRoute[(start, end)];
+            sequenceLength += GetMetaSequenceLength($"A{shortestRoute}", nrRobots, memoizationCache);
+        }
+        return sequenceLength;
+    }
+
+    private long GetMetaSequenceLength(string sequence, int nrRobots, Dictionary<(string, int), long> memoizationCache)
+    {
+        if (nrRobots == 0)
+        {
+            // 'A' was added to the start so we shouldn't count it in the final sequence length.
+            return sequence.Length - 1;
+        }
+
+        if (memoizationCache.TryGetValue((sequence, nrRobots), out long length))
+        {
+            return length;
+        }
+
+        long sequenceLength = 0;
+        for (int i = 0; i < sequence.Length - 1; i++)
+        {
+            char start = sequence[i];
+            char end = sequence[i + 1];
+            string shortestRoute = optimalPadRoute[(start, end)];
+            sequenceLength += GetMetaSequenceLength($"A{shortestRoute}", nrRobots - 1, memoizationCache);
+        }
+
+        memoizationCache[(sequence, nrRobots)] = sequenceLength;
+        return sequenceLength;
     }
 
     public static List<string> GetHumanSequences(char c1, char c2, int nrRobots)

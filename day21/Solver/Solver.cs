@@ -2,14 +2,15 @@ namespace AoC;
 
 public class Solver(List<string> lines)
 {
-    public int SolvePart1()
+    public long SolvePart1()
     {
         return lines.
-            Sum(s => Keypad.GetHumanSequenceLength(s, nrRobots: 3) * int.Parse(s.Trim('A')));
+            Sum(s => new Keypad(3).GetHumanSequenceLength(s) * int.Parse(s.Trim('A')));
     }
 
-    public int SolvePart2()
+    public long SolvePart2()
     {
-        return 0;
+        return lines.
+            Sum(s => new Keypad(25).GetHumanSequenceLength(s) * int.Parse(s.Trim('A')));
     }
 }
