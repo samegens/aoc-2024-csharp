@@ -36,24 +36,4 @@ public class KeypadTests
         // Assert
         Assert.That(commandSequences, Is.EquivalentTo(expected));
     }
-
-    [Test]
-    public void TestGetHumanSequencesTwoChars()
-    {
-        // Act
-        List<string> sequences = Keypad.GetHumanSequences('A', '0', 3);
-
-        // Assert
-        Assert.That(sequences, Contains.Item("<vA<AA>>^AvAA<^A>A"));
-    }
-
-    [Test]
-    public void TestGetHumanSequences()
-    {
-        // Act
-        List<string> sequences = Keypad.GetHumanSequences("A029A", 0, 3);
-
-        // Assert
-        Assert.That(sequences, Contains.Item("<vA<AA>>^AvAA<^A>Av<<A>>^AvA^A<vA>^Av<<A>^A>AAvA^Av<<A>A>^AAAvA<^A>A"));
-    }
 }

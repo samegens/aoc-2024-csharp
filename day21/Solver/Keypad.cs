@@ -64,116 +64,6 @@ public class Keypad(int nrRobots)
         return GetMinHumanSequenceLength($"A{code}", nrRobots);
     }
 
-    public static void PrintCommandOutput(string commands)
-    {
-        List<Board> boards = [];
-        for (int i = 0; i < 2; i++)
-        {
-            boards.Add(CreateDirectionalPadBoard());
-        }
-        boards.Add(CreateLockBoard());
-        Print(boards);
-
-        foreach (char command in commands)
-        {
-            ExecuteCommand(command, 0, boards);
-            Print(boards);
-            Console.WriteLine();
-        }
-    }
-
-    private static void ExecuteCommand(char command, int boardIndex, List<Board> boards)
-    {
-        if (boardIndex == boards.Count)
-        {
-            Console.WriteLine($"Lockboard: {command}");
-            return;
-        }
-
-        Board board = boards[boardIndex];
-        switch (command)
-        {
-            case '^':
-                board.Current = board.Current.Move(Direction.Up);
-                break;
-            case '>':
-                board.Current = board.Current.Move(Direction.Right);
-                break;
-            case 'v':
-                board.Current = board.Current.Move(Direction.Down);
-                break;
-            case '<':
-                board.Current = board.Current.Move(Direction.Left);
-                break;
-            case 'A':
-                char commandForNextBoard = board[board.Current];
-                ExecuteCommand(commandForNextBoard, boardIndex + 1, boards);
-                break;
-        }
-
-        if (!board.CanBeEntered(board.Current))
-        {
-            throw new Exception($"Trying to enter {board.Current.X},{board.Current.Y} on board {boardIndex}");
-        }
-    }
-
-    private static void Print(List<Board> padBoards)
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            IEnumerable<string> padBoardRows = padBoards.Select(p => p.ToString(i));
-            Console.WriteLine($"{string.Join(' ', padBoardRows)}");
-        }
-    }
-
-    private static Board CreateDirectionalPadBoard()
-    {
-        List<string> input = """
-        #^A
-        <v>
-        """.Split('\n').ToList();
-        return new Board(input);
-    }
-
-    private static Board CreateLockBoard()
-    {
-        List<string> input = """
-        789
-        456
-        123
-        #0A
-        """.Split('\n').ToList();
-        return new Board(input);
-    }
-
-    public static List<string> GetHumanSequences(string code, int codeIndex, int nrRobots)
-    {
-        List<string> resultSequences = [];
-        if (codeIndex == code.Length - 1)
-        {
-            return resultSequences;
-        }
-
-        List<string> sequencesForCurrentTransition = GetHumanSequences(code[codeIndex], code[codeIndex + 1], nrRobots);
-        foreach (string sequence in sequencesForCurrentTransition)
-        {
-            List<string> sequencesForRest = GetHumanSequences(code, codeIndex + 1, nrRobots);
-            if (sequencesForRest.Any())
-            {
-                foreach (string sequenceForRest in sequencesForRest)
-                {
-                    resultSequences.Add($"{sequence}{sequenceForRest}");
-                }
-            }
-            else
-            {
-                resultSequences.Add(sequence);
-            }
-        }
-
-        return resultSequences;
-    }
-
     public long GetMinHumanSequenceLength(string code, int nrRobots)
     {
         if (memoizationCache.TryGetValue((code, nrRobots), out long length))
@@ -213,7 +103,7 @@ public class Keypad(int nrRobots)
         return sequenceLength;
     }
 
-    private List<List<string>> GenerateMovesToTry(List<List<string>> possibleMovesPerTileTransition)
+    private static List<List<string>> GenerateMovesToTry(List<List<string>> possibleMovesPerTileTransition)
     {
         if (possibleMovesPerTileTransition.Count == 1)
         {
@@ -239,55 +129,6 @@ public class Keypad(int nrRobots)
             }
         }
         return movesToTry;
-    }
-
-    public static List<string> GetHumanSequences(char c1, char c2, int nrRobots)
-    {
-        Point2d p1 = lockCharToPointMap[c1];
-        Point2d p2 = lockCharToPointMap[c2];
-        List<string> lockCommands = GetCommandSequences(p1, p2, 3);
-        List<string> metaCommands = lockCommands;
-        for (int i = 0; i < nrRobots - 1; i++)
-        {
-            metaCommands = GetMetaCommandSequences(metaCommands);
-        }
-        return metaCommands;
-    }
-
-    private static List<string> GetMetaCommandSequences(List<string> sequences)
-    {
-        return sequences
-            .SelectMany(s => GetMetaCommandSequences($"A{s}", 0, 0))
-            .ToList();
-    }
-
-    private static List<string> GetMetaCommandSequences(string commands, int commandIndex, int yOfInvalidTile)
-    {
-        List<string> allSequences = [];
-        if (commandIndex >= commands.Length - 1)
-        {
-            return allSequences;
-        }
-        Point2d p1 = directionalKeypadCharToPointMap[commands[commandIndex]];
-        Point2d p2 = directionalKeypadCharToPointMap[commands[commandIndex + 1]];
-        List<string> sequences = GetCommandSequences(p1, p2, yOfInvalidTile);
-        foreach (string sequence in sequences)
-        {
-            List<string> restSequences = GetMetaCommandSequences(commands, commandIndex + 1, yOfInvalidTile);
-            if (restSequences.Any())
-            {
-                foreach (string restSequence in restSequences)
-                {
-                    allSequences.Add($"{sequence}{restSequence}");
-                }
-            }
-            else
-            {
-                allSequences.Add(sequence);
-            }
-        }
-
-        return allSequences;
     }
 
     public static List<string> GetCommandSequences(Point2d p1, Point2d p2, int yOfInvalidTile)
@@ -323,6 +164,7 @@ public class Keypad(int nrRobots)
     {
         return p1.X == 0 && p2.Y == yOfInvalidTile;
     }
+
     private static string GetCommandSequenceHorizontalMovementFirst(Point2d p1, Point2d p2)
     {
         Point2d delta = p2 - p1;
