@@ -7,6 +7,6 @@ public class Program
         string[] lines = File.ReadAllLines("input.txt");
         Solver solver = new(lines.ToList());
         Console.WriteLine($"Part 1: {solver.SolvePart1()}");
-        // Console.WriteLine($"Part 2: {solver.SolvePart2()}");
+        Console.WriteLine($"Part 2: {solver.SolvePart2()}");
     }
 }

@@ -182,6 +182,12 @@ public class NonDirectedGraph
         return node;
     }
 
+    /// <summary>
+    /// Finds clusters and returns them in the form aa,bb,cc where the names are sorted.
+    /// </summary>
+    /// <remarks>
+    /// Using strings instead of lists or hashsets greatly speeds up filtering out duplicates.
+    /// </remarks>
     public HashSet<string> FindClusters()
     {
         HashSet<string> resultClusters = [];
@@ -233,19 +239,49 @@ public class NonDirectedGraph
 
     public List<GraphNode> GetLargestCluster()
     {
-        Dictionary<GraphNode, int> neighbourCount = [];
-        foreach (GraphNode node in _nameToNodeMap.Values)
+        // I noticed in the example that there is one node of the LAN party that
+        // occurs most often as first node in the clusters of 3. 
+        // So we'll look for that node first.
+        HashSet<string> clustersOf3 = FindClusters();
+        Dictionary<string, int> frequencyCountFirst = [];
+        HashSet<string> nodeIsInClusterOf3 = [];
+        foreach (string clusterNames in clustersOf3)
         {
-            neighbourCount[node] = GetNeighbors(node).Count;
+            string firstName = clusterNames[0..2];
+            if (!frequencyCountFirst.ContainsKey(firstName))
+            {
+                frequencyCountFirst[firstName] = 0;
+            }
+            frequencyCountFirst[firstName] = frequencyCountFirst[firstName] + 1;
+            nodeIsInClusterOf3.Add(firstName);
+
+            string secondName = clusterNames[3..5];
+            nodeIsInClusterOf3.Add(secondName);
+
+            string thirdName = clusterNames[6..8];
+            nodeIsInClusterOf3.Add(thirdName);
         }
 
-        GraphNode nodeWithMostNeighbours = neighbourCount
+        string name = frequencyCountFirst
             .OrderByDescending(kvp => kvp.Value)
             .First()
             .Key;
 
-        List<GraphNode> cluster = GetNeighbors(nodeWithMostNeighbours);
-        cluster.Add(nodeWithMostNeighbours);
+        // We now have the node that is probably a node of the LAN party.
+        // (that is an assumption, we don't check for that)
+        // We now have to find all neighbours that are part of the LAN party.
+        // A neighbour is only part of the LAN party when it occurs in a cluster
+        // together with the node we found before.
+        GraphNode nodeInMostClustersOf3 = _nameToNodeMap[name];
+        List<GraphNode> cluster = [nodeInMostClustersOf3];
+        HashSet<string> clustersOf3WithNode = new(clustersOf3.Where(c => c.StartsWith(name)));
+        foreach (GraphNode neighbour in GetNeighbors(nodeInMostClustersOf3))
+        {
+            if (clustersOf3WithNode.Any(c => c.Contains(neighbour.Name)))
+            {
+                cluster.Add(neighbour);
+            }
+        }
         return cluster;
     }
 }

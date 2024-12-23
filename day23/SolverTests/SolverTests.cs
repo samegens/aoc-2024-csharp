@@ -53,7 +53,6 @@ public class SolverTests
     }
 
     [Test]
-    [Ignore("WIP")]
     public void TestSolvePart2()
     {
         // Arrange
