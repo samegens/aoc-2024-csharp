@@ -33,7 +33,7 @@ public class Network
         return (parts[0], parts[1]);
     }
 
-    public HashSet<HashSet<string>> FindClusters()
+    public HashSet<string> FindClusters()
     {
         return _graph.FindClusters();
     }

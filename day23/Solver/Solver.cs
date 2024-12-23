@@ -5,9 +5,9 @@ public class Solver(List<string> lines)
     public int SolvePart1()
     {
         Network network = Network.Parse(lines);
-        HashSet<HashSet<string>> clusters = network.FindClusters();
+        HashSet<string> clusters = network.FindClusters();
         return clusters
-            .Count(c => c.Any(n => n[0] == 't'));
+            .Count(c => c[0] == 't' || c[3] == 't' || c[6] == 't');
     }
 
     public string SolvePart2()

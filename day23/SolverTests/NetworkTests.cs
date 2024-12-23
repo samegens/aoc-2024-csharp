@@ -69,18 +69,13 @@ public class NetworkTests
         ee-cc
         """.Split('\n').ToList();
         Network sut = Network.Parse(input);
-        HashSet<HashSet<string>> expected = [
-            ["aa", "bb", "cc"],
-            ["cc", "dd", "ee"]
-        ];
+        HashSet<string> expected = ["aa,bb,cc", "cc,dd,ee"];
 
         // Act
-        HashSet<HashSet<string>> actual = sut.FindClusters();
+        HashSet<string> actual = sut.FindClusters();
 
         // Assert
-        Assert.That(actual.Count, Is.EqualTo(expected.Count));
-        Assert.That(actual.First(), Is.EquivalentTo(expected.First()));
-        Assert.That(actual.Last(), Is.EquivalentTo(expected.Last()));
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
 
     [Test]
@@ -90,7 +85,7 @@ public class NetworkTests
         Network sut = Network.Parse(exampleInput);
 
         // Act
-        HashSet<HashSet<string>> actual = sut.FindClusters();
+        HashSet<string> actual = sut.FindClusters();
 
         // Assert
         Assert.That(actual.Count, Is.EqualTo(12));

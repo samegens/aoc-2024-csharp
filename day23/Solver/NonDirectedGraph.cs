@@ -182,34 +182,31 @@ public class NonDirectedGraph
         return node;
     }
 
-    public HashSet<HashSet<string>> FindClusters()
+    public HashSet<string> FindClusters()
     {
-        HashSet<HashSet<string>> resultClusters = [];
+        HashSet<string> resultClusters = [];
         foreach (string name in _nameToNodeMap.Keys)
         {
-            HashSet<HashSet<string>> nodeClusters = FindClusters(name);
-            foreach (HashSet<string> cluster in nodeClusters)
+            HashSet<string> nodeClusters = FindClusters(name);
+            foreach (string cluster in nodeClusters)
             {
-                if (!resultClusters.Any(c => c.SetEquals(cluster)))
-                {
-                    resultClusters.Add(cluster);
-                }
+                resultClusters.Add(cluster);
             }
         }
         return resultClusters;
     }
 
-    private HashSet<HashSet<string>> FindClusters(string name)
+    private HashSet<string> FindClusters(string name)
     {
         GraphNode start = _nameToNodeMap[name];
         Stack<GraphNode> currentPath = [];
-        HashSet<HashSet<string>> clusters = [];
+        HashSet<string> clusters = [];
         FindPathTo(start, 3, start, currentPath, clusters);
         return clusters;
     }
 
     private void FindPathTo(GraphNode destNode, int nrSteps, GraphNode currentNode,
-                            Stack<GraphNode> currentPath, HashSet<HashSet<string>> clusters)
+                            Stack<GraphNode> currentPath, HashSet<string> clusters)
     {
         if (nrSteps == 0)
         {
@@ -228,13 +225,10 @@ public class NonDirectedGraph
         currentPath.Pop();
     }
 
-    private static void AddPathToCluster(Stack<GraphNode> path, HashSet<HashSet<string>> clusters)
+    private static void AddPathToCluster(Stack<GraphNode> path, HashSet<string> clusters)
     {
-        HashSet<string> newCluster = new(path.Select(n => n.Name));
-        if (!clusters.Any(c => c.SetEquals(newCluster)))
-        {
-            clusters.Add(newCluster);
-        }
+        string newCluster = string.Join(',', path.Select(n => n.Name).Order());
+        clusters.Add(newCluster);
     }
 
     public List<GraphNode> GetLargestCluster()
