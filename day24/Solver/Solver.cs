@@ -7,8 +7,12 @@ public class Solver(List<string> lines)
         return Device.Parse(lines).ProduceNumber();
     }
 
-    public int SolvePart2()
+    public string SolvePart2()
     {
-        return 0;
+        return string.Join(',',
+            Device.Parse(lines)
+            .GetInvalidGates()
+            .Select(g => g.WireOut)
+            .Order());
     }
 }

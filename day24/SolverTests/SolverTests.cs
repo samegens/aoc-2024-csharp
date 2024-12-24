@@ -67,19 +67,5 @@ public class SolverTests
         Assert.That(result, Is.EqualTo(2024));
     }
 
-    [Test]
-    public void TestSolvePart2()
-    {
-        // Arrange
-        List<string> input = [.. """
-        hello world
-        """.Split('\n')];
-        Solver sut = new(input);
-
-        // Act
-        int result = sut.SolvePart2();
-
-        // Assert
-        Assert.That(result, Is.EqualTo(0));
-    }
+    // Example and input differ too much to use solver test for part 2.
 }

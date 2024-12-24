@@ -8,6 +8,8 @@ public class Gate(string _wireIn1, string _wireIn2, string _op, string _wireOut)
     public string Op => _op;
     public string WireOut => _wireOut;
 
+    public string Name => $"{WireIn1}{Op}{WireIn2}";
+
     public static Gate Parse(string line)
     {
         line = line.Replace(" OR", " OR ");
@@ -33,4 +35,6 @@ public class Gate(string _wireIn1, string _wireIn2, string _op, string _wireOut)
                 throw new Exception($"Unknown operation {Op}");
         }
     }
+
+    public bool HasWireIn(string name) => WireIn1 == name || WireIn2 == name;
 }
